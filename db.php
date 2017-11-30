@@ -140,6 +140,7 @@ class db
         $relanceSeance->idutilisateur = $utilisateur->id;
         $relanceSeance->save();
 
+
         $this->sendMail($mail, $pwd);
 
         return true;
