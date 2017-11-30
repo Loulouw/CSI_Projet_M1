@@ -131,8 +131,8 @@ a:after {
    ========================================================================== */
 
 #headerwrap {
-    margin-top: 50px;
 	padding-top:20px;
+	margin-top:50px;
 	text-align:center;
     background: url(../images/header-bg.jpg) no-repeat center;
     min-height: 500px;
@@ -274,4 +274,12 @@ a:after {
 	color: #ff7878;
 	font-size: 12px;
 	padding: 5px;
+}
+
+.n{
+	margin-top: 100px;
+}
+
+#buttonInscription{
+	width:100%;
 }
