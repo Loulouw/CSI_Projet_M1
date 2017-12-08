@@ -12,7 +12,14 @@
         <div class="navbar-collapse collapse">
             <ul class="nav navbar-nav navbar-right">
                 <li><a href="index.php">Accueil</a></li>
-                <li><a href="connexion.php">Connexion/Inscription</a></li>
+                <?php
+                    if(isset($_SESSION['idUtilisateur'])){
+                        echo "<li><a href='deconnexion.php'>Deconnexion</a></li>";
+                    }else{
+                        echo "<li><a href='connexion.php'>Connexion/Inscription</a></li>";
+                    }
+                ?>
+
             </ul>
         </div><!--/.nav-collapse -->
     </div>

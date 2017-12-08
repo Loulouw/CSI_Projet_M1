@@ -4,6 +4,15 @@
         <div class="col-md-2"></div>
         <div class="col-md-4">
             <div class="well">
+                <?php
+                if(isset($_POST['connexionsend'])){
+                    $idUtilisateur = $db->connexion($_POST['username'],$_POST['password']);
+                    if($idUtilisateur != 0){
+                        $_SESSION['idUtilisateur'] = $idUtilisateur;
+                        header('Location: index.php');
+                    }
+                }
+                ?>
                 <form id="loginForm" method="POST" action="">
                     <div class="form-group">
                         <label for="username" class="control-label">Identifiant</label>
@@ -17,7 +26,7 @@
                                title="Entrez votre mot de passe">
                         <span class="help-block"></span>
                     </div>
-                    <button type="submit" class="btn btn-success btn-block">Connexion</button>
+                    <button id="buttonConnexion" type="submit" name="connexionsend" class="btn btn-success btn-block">Connexion</button>
                 </form>
             </div>
         </div>

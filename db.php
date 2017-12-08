@@ -124,6 +124,7 @@ class db
         $utilisateur->datederniereinteraction = date("Y-m-d H:i:s");
         $utilisateur->idstatusutilisateur = 4;
         $utilisateur->idconnexion = $connexion->id;
+        $utilisateur->datevalidationpaiement = date("Y-m-d H:i:s");
         $utilisateur->save();
 
         $relanceAbonnement = ORM::for_table('relance')->create();
@@ -145,6 +146,20 @@ class db
 
         return true;
     }
+
+    function connexion($identifiant,$password){
+        $res = 0;
+        $connexion = ORM::for_table('connexion')->where('identifiantconnexion',$identifiant)->findOne();
+        if($connexion != null && password_verify($password,$connexion->motdepasse)){
+            $utilisateur = ORM::for_table('utilisateur')->where('idconnexion',$connexion->id)->findOne();
+            $res = $utilisateur->id;
+        }
+        return $res;
+    }
+
+
+
+
 
 
     function updateUser($mail)
