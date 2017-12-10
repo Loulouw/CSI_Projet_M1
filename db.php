@@ -118,13 +118,13 @@ class db
         $utilisateur->prenom = $prenom;
         $utilisateur->mail = $mail;
         $utilisateur->telephone = $tel;
-        $utilisateur->datepaiementfrais = date("Y-m-d H:i:s");
+        $utilisateur->datepaiementfrais = date("Y-m-d");
         $utilisateur->nombreseancedisponible = 1;
         $utilisateur->compteactif = true;
-        $utilisateur->datederniereinteraction = date("Y-m-d H:i:s");
+        $utilisateur->datederniereinteraction = date("Y-m-d");
         $utilisateur->idstatusutilisateur = 4;
         $utilisateur->idconnexion = $connexion->id;
-        $utilisateur->datevalidationpaiement = date("Y-m-d H:i:s");
+        $utilisateur->datevalidationpaiement = date("Y-m-d");
         $utilisateur->save();
 
         $relanceAbonnement = ORM::for_table('relance')->create();
@@ -148,256 +148,51 @@ class db
     }
 
     function connexion($identifiant,$password){
-        $res = 0;
+        $res = null;
         $connexion = ORM::for_table('connexion')->where('identifiantconnexion',$identifiant)->findOne();
         if($connexion != null && password_verify($password,$connexion->motdepasse)){
             $utilisateur = ORM::for_table('utilisateur')->where('idconnexion',$connexion->id)->findOne();
-            $res = $utilisateur->id;
+            $res = $utilisateur;
         }
         return $res;
     }
 
-
-
-
-
-
-    function updateUser($mail)
-    {
-        $user = ORM::for_table('utilisateur')->where('mail', $mail)->find_one();
-        $user->datepaiement = date('Y-m-d');
-        $user->save();
-    }
-
-    function getBureau()
-    {
-        $id = ORM::for_table('histbureau')->count('*');
-        $bureau = ORM::for_table('histbureau')->where('idbureau', $id)->find_one();
-        return array($bureau['id1'], $bureau['id2'], $bureau['id3'], $bureau['id4'], $bureau['id5'], $bureau['id6'], $bureau['id7']);
-    }
-
-    function getAllStatut()
-    {
-        return ORM::for_table('statut')->findArray();
-    }
-
-    function getStatut($id)
-    {
-        return ORM::for_table('statut')->where('idstatut', $id)->findArray()[0]["nomstatut"];
-    }
-
-    function canDeleteComment($idUser)
-    {
-        $statut = $this->getStatut($idUser);
-        $idCanDelete = array(1, 2, 3, 4, 5, 6, 7);
-        return in_array($statut, $idCanDelete);
-    }
-
-    function getLatestEvent()
-    {
-        return ORM::for_table('evenement')->find_one()->order_by_asc('datedebut')->where('valide', 'true');
-    }
-
-    function getPendingEvent()
-    {
-        return ORM::for_table('evenement')->where('valide', 'false')->findArray();
-    }
-
-    function getAllMembers()
-    {
-        return ORM::for_table('utilisateur')->order_by_asc('idutilisateur')->findArray();
-    }
-
-    function getAllMembersDate()
-    {
-        return ORM::for_table('utilisateur')->order_by_desc('dateinscr')->findArray();
-    }
-
-    function getEvent($id)
-    {
-        return ORM::for_table('evenement')->where('idevenement', $id)->findArray()[0];
-    }
-
-    function getUser($id)
-    {
-        return ORM::for_table('utilisateur')->where('idutilisateur', $id)->findArray()[0];
-    }
-
-    function getAllEvents()
-    {
-        return ORM::for_table('evenement')->findArray();
-    }
-
-    function getEventId()
-    {
-        return ORM::for_table('evenement')->max('idevenement') + 1;
-    }
-
-    function addEvent($id, $titre, $datedebut, $datefin, $nbplaces, $tarifmembre, $tarifbase, $idorga, $desc, $lieu)
-    {
-        $event = ORM::for_table('evenement')->create();
-        $event->idevenement = $id;
-        $event->titreevenement = $titre;
-        $event->datedebut = $datedebut;
-        $event->datefin = $datefin;
-        $event->fini = 'false';
-        $event->nbplaces = $nbplaces;
-        $event->discute = 'false';
-        $event->valide = 'false';
-        $event->tarifmembre = $tarifmembre;
-        $event->tarifbase = $tarifbase;
-        $event->idorganisateur = $idorga;
-        $event->description = $desc;
-        $event->lieu = $lieu;
-        $event->save();
-    }
-
-    function getUserId($mail)
-    {
-        return ORM::for_table('utilisateur')->where_like('mail', "$mail%")->findArray()[0]['idutilisateur'];
-    }
-
-    function isRoot($mail)
-    {
-        $id = $this->getUserId($mail);
-        return !empty(ORM::for_table('histbureau')
-            ->where_any_is(array(
-                array('id1' => $id),
-                array('id2' => $id),
-                array('id3' => $id),
-                array('id4' => $id),
-                array('id5' => $id),
-                array('id6' => $id),
-                array('id7' => $id)))
-            ->findArray());
-    }
-
-    function acceptAd($id)
-    {
-        $user = ORM::for_table('utilisateur')->where('idutilisateur', $id)->find_one();
-        $user->idstatut = 9;
-        $user->datedelabdeadh = date('Y-m-d');
-        $user->save();
-    }
-
-    function getPendingAd()
-    {
-        return ORM::for_table('utilisateur')->where('idstatut', 8)->where_not_null('datepaiement')->findArray();
-    }
-
-    function getAllParticipations()
-    {
-        return ORM::for_table('participe')->where('paye', 'true')->findArray();
-    }
-
-    function valideEvent($id)
-    {
-        $event = ORM::for_table('evenement')->where('idevenement', $id)->find_one();
-        $event->valide = true;
-        $event->save();
-    }
-
-    function cancelEvent($id)
-    {
-        ORM::for_table('commente')->where('idevenement', $id)->delete_many();
-        ORM::for_table('administre')->where('idevenement', $id)->delete_many();
-        ORM::for_table('participe')->where('idevenement', $id)->delete_many();
-        ORM::for_table('evenement')->where('idevenement', $id)->delete_many();
-    }
-
-    function register($nom, $prenom, $dob, $adresse, $cp, $ville, $mail, $pwd)
-    {
-        $id = ORM::for_table('utilisateur')->count();
-        $id++;
-
-        $person = ORM::for_table('utilisateur')->create();
-
-        $person->idutilisateur = $id;
-        $person->nom = $nom;
-        $person->prenom = $prenom;
-        $person->datenaiss = $dob;
-        $person->adresse = $adresse;
-        $person->codepostal = $cp;
-        $person->ville = $ville;
-        //$person->dateinscr = '19/10/1995';
-        $person->idstatut = 2;
-        $person->mail = $mail;
-        $person->mdp = $pwd;
-        $person->save();
-    }
-
-    function connect($mail, $pwd)
-    {
-        $count = ORM::for_table('utilisateur')->where(array(
-            'mail' => $mail,
-            'mdp' => $pwd
-        ))->count('*');
-        return $count;
-    }
-
-    function getComments($id)
-    {
-        $test = ORM::for_table('commente')->where('idevenement', $id)->find_array();
-        return $test;
-    }
-
-    function deleteComment($idEvent, $idUser)
-    {
-        ORM::for_table('commente')->where(array(
-            "idutilisateur" => $idUser,
-            "idevenement" => $idEvent
-        ))->delete_many();
-    }
-
-    function getNameFromComment($id)
-    {
-        $user = ORM::for_table('utilisateur')->find_one($id);
-        return $user->prenom;
-    }
-
-    function getTarifForUser($mail, $idevent)
-    {
-        $count = ORM::for_table('utilisateur')->where(array(
-            'mail' => $mail,
-            'idstatut' => '3'
-        ))->count('*');
-        if ($count > 0) {
-            $event = ORM::for_table('evenement')->find_one($idevent);
-            return $event['tarifmembre'];
-        } else {
-            $event = ORM::for_table('evenement')->find_one($idevent);
-            return $event['tarifbase'];
+    function getAbonnementEnCours($idUtilisateur){
+        $abonnements = ORM::for_table('utilisateurtoabonnement')->where('idutilisateur',$idUtilisateur)->findArray();
+        foreach($abonnements as $a){
+            $abonnement = ORM::for_table('abonnement')->where('id',$a->idabonnement)->findOne();
+            if($abonnement->encours) {
+                return $abonnement;
+            }
         }
+        return null;
     }
 
-    function createCommente($mail, $idevent, $comment)
-    {
-        $user = ORM::for_table('utilisateur')->where('mail', $mail)->find_one();
-        // return array($user['idUtilisateur'], $idevent, $comment);
-
-        $commente = ORM::for_table('commente')->create();
-
-        $commente['idutilisateur'] = $user['idutilisateur'];
-        $commente->idevenement = $idevent;
-        $commente->texte = $comment;
-
-        $commente->save();
+    function getTypeAbonnement($abonnement){
+        return ORM::for_table('abonnementtype')->where('id',$abonnement->idabonnementtype)->findOne();
     }
 
-    function getNbParticipants($id)
-    {
-        return ORM::for_table('participe')->where('idevenement', $id)->count();
+    function getJoursRestantAbonnement($abonnement){
+        $dateFin = date('Y-m-d', strtotime($abonnement->datedebut. ' + ' . $abonnement->duree . ' days'));
+        return ($dateFin - date('Y-m-d'));
     }
 
-    function addParticipe($idevent, $mail)
-    {
-        $user = ORM::for_table('utilisateur')->where('mail', $mail)->find_one();
-        $participe = ORM::for_table('participe')->create();
-
-        $participe->idutilisateur = $user['idutilisateur'];
-        $participe->idevenement = $idevent;
-        $particip['paye'] = 'true';
-
-        $participe->save();
+    function getRelanceAbonnement($idUtilisateur){
+        return ORM::for_table('relance')->where('idutilisateur',$idUtilisateur)->where('idrelancetype',1)->findOne();
     }
+
+    function updateRelanceAbonnement($relance,$heures){
+
+    }
+
+    function getRelanceSeance($idUtilisateur){
+        return ORM::for_table('relance')->where('idutilisateur',$idUtilisateur)->where('idrelancetype',2)->findOne();
+    }
+
+    function updateRelance($prelance,$heures){
+        $relance = ORM::for_table('relance')->where('id',$prelance->id)->findOne();
+        $relance->tempsavantrelance = $heures;
+        $relance->save();
+    }
+
 }

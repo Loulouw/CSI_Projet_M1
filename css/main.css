@@ -283,3 +283,19 @@ a:after {
 #buttonInscription{
 	width:100%;
 }
+
+.heuresRelance{
+	display: inline;
+	color: #1b6d85;
+	font-weight: bold;
+}
+
+.btnmodifrelance{
+	margin-left: 30px;
+}
+
+.numberRelance{
+	display: inline;
+	width: 80px;
+	color: #1b6d85;
+}

@@ -6,10 +6,12 @@
             <div class="well">
                 <?php
                 if(isset($_POST['connexionsend'])){
-                    $idUtilisateur = $db->connexion($_POST['username'],$_POST['password']);
-                    if($idUtilisateur != 0){
-                        $_SESSION['idUtilisateur'] = $idUtilisateur;
+                    $utilisateur = $db->connexion($_POST['username'],$_POST['password']);
+                    if($utilisateur != null){
+                        $_SESSION['utilisateur'] = $utilisateur;
                         header('Location: index.php');
+                    }else{
+                        echo "<div class=\"alert alert-danger\">L'identifiant n'existe pas ou le mote de passe est incorrect.</div>";
                     }
                 }
                 ?>
