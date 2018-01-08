@@ -26,7 +26,7 @@
                 <?php
                     $abonnement = $db->getAbonnementEnCours($_SESSION['utilisateur']->id);
                     if($abonnement != null){
-                        echo $db->getJoursRestantAbonnement($abonnement) . " jours";
+                        echo $db->getJoursRestantAbonnement($_SESSION['utilisateur']->id);
                     }else{
                         echo "Aucun abonnement";
                     }

@@ -147,52 +147,125 @@ class db
         return true;
     }
 
-    function connexion($identifiant,$password){
+    function connexion($identifiant, $password)
+    {
         $res = null;
-        $connexion = ORM::for_table('connexion')->where('identifiantconnexion',$identifiant)->findOne();
-        if($connexion != null && password_verify($password,$connexion->motdepasse)){
-            $utilisateur = ORM::for_table('utilisateur')->where('idconnexion',$connexion->id)->findOne();
+        $connexion = ORM::for_table('connexion')->where('identifiantconnexion', $identifiant)->findOne();
+        if ($connexion != null && password_verify($password, $connexion->motdepasse)) {
+            $utilisateur = ORM::for_table('utilisateur')->where('idconnexion', $connexion->id)->findOne();
             $res = $utilisateur;
         }
         return $res;
     }
 
-    function getAbonnementEnCours($idUtilisateur){
-        $abonnements = ORM::for_table('utilisateurtoabonnement')->where('idutilisateur',$idUtilisateur)->findArray();
-        foreach($abonnements as $a){
-            $abonnement = ORM::for_table('abonnement')->where('id',$a->idabonnement)->findOne();
-            if($abonnement->encours) {
+    function getAbonnementEnCours($idUtilisateur)
+    {
+        $abonnements = ORM::for_table('utilisateurtoabonnement')->where('idutilisateur', $idUtilisateur)->findArray();
+        foreach ($abonnements as $a) {
+            $abonnement = ORM::for_table('abonnement')->where('id', $a['idabonnement'])->findOne();
+
+            if ($abonnement->encours) {
                 return $abonnement;
             }
         }
         return null;
     }
 
-    function getTypeAbonnement($abonnement){
-        return ORM::for_table('abonnementtype')->where('id',$abonnement->idabonnementtype)->findOne();
+    function getTypeAbonnement($abonnement)
+    {
+        return ORM::for_table('abonnementtype')->where('id', $abonnement->idabonnementtype)->findOne();
     }
 
-    function getJoursRestantAbonnement($abonnement){
-        $dateFin = date('Y-m-d', strtotime($abonnement->datedebut. ' + ' . $abonnement->duree . ' days'));
-        return ($dateFin - date('Y-m-d'));
+    function getJoursRestantAbonnement($idUtilisateur)
+    {
+        $dureeJour = 0;
+        $dateDebut = date("Y-m-d");
+        foreach ($this->getAllAbonnement($idUtilisateur) as $a) {
+            $dureeJour += $a['duree'];
+            if (strtotime($a['datedebut']) < strtotime($dateDebut)) $dateDebut = $a['datedebut'];
+        }
+        $dateFin = date('Y-m-d', strtotime($dateDebut . ' + ' . $dureeJour . ' days'));
+        $df = DateTime::createFromFormat("Y-m-d", $dateFin);
+        $db = DateTime::createFromFormat("Y-m-d", date('Y-m-d'));
+        $interval = $df->diff($db);
+        return $interval->format('%y ans, %m mois et %d jours');
     }
 
-    function getRelanceAbonnement($idUtilisateur){
-        return ORM::for_table('relance')->where('idutilisateur',$idUtilisateur)->where('idrelancetype',1)->findOne();
+    function getRelanceAbonnement($idUtilisateur)
+    {
+        return ORM::for_table('relance')->where('idutilisateur', $idUtilisateur)->where('idrelancetype', 1)->findOne();
     }
 
-    function updateRelanceAbonnement($relance,$heures){
-
+    function getRelanceSeance($idUtilisateur)
+    {
+        return ORM::for_table('relance')->where('idutilisateur', $idUtilisateur)->where('idrelancetype', 2)->findOne();
     }
 
-    function getRelanceSeance($idUtilisateur){
-        return ORM::for_table('relance')->where('idutilisateur',$idUtilisateur)->where('idrelancetype',2)->findOne();
-    }
-
-    function updateRelance($prelance,$heures){
-        $relance = ORM::for_table('relance')->where('id',$prelance->id)->findOne();
+    function updateRelance($prelance, $heures)
+    {
+        $relance = ORM::for_table('relance')->where('id', $prelance->id)->findOne();
         $relance->tempsavantrelance = $heures;
         $relance->save();
+    }
+
+    function ajout10Seance($idUtilisateur)
+    {
+        $utilisateur = ORM::for_table('utilisateur')->where('id', $idUtilisateur)->findOne();
+        $utilisateur->nombreseancedisponible = $utilisateur->nombreseancedisponible + 10;
+        $utilisateur->save();
+    }
+
+    function updateAbonnement($idUtilisateur, $idAbonnementType)
+    {
+        $abonnement = ORM::for_table('abonnement')->create();
+        $abonnement->id = $this->getLastId('abonnement');
+        if ($idAbonnementType == 1) {
+            $abonnement->duree = 30;
+        } else if ($idAbonnementType == 2) {
+            $abonnement->duree = 365;
+        }
+        $abonnement->idabonnementtype = $idAbonnementType;
+
+        $allAbonnement = $this->getAllAbonnement($idUtilisateur);
+
+        if (sizeof($allAbonnement) <= 0) {
+            $abonnement->encours = true;
+            $abonnement->datedebut = date("Y-m-d");
+        } else {
+            $abonnementEnCours = true;
+            $derniereDate = date("Y-m-d");
+            foreach ($allAbonnement as $a) {
+                if ($abonnementEnCours && $a->encours) {
+                    $abonnementEnCours = false;
+                }
+                $dateFin = date('Y-m-d', strtotime($a->datedebut . ' + ' . $a->duree . ' days'));
+                if (strtotime($dateFin) > strtotime($derniereDate)) {
+                    $derniereDate = $dateFin;
+                }
+            }
+
+            $abonnement->encours = $abonnementEnCours;
+            $abonnement->datedebut = date('Y-m-d', strtotime($derniereDate . ' + ' . 1 . ' days'));
+        }
+
+        $abonnement->save();
+
+        $uta = ORM::for_table("utilisateurtoabonnement")->create();
+        $uta->id = $this->getLastId("utilisateurtoabonnement");
+        $uta->idutilisateur = $idUtilisateur;
+        $uta->idabonnement = $abonnement->id;
+        $uta->save();
+    }
+
+    function getAllAbonnement($idUtilisateur)
+    {
+        $utilisateurtoabonnement = ORM::for_table("utilisateurtoabonnement")->where('idutilisateur', $idUtilisateur)->findArray();
+        $abonnements = array();
+        foreach ($utilisateurtoabonnement as $ua) {
+            $abo = ORM::for_table("abonnement")->where("id", $ua['idabonnement'])->findOne();
+            array_push($abonnements, $abo);
+        }
+        return $abonnements;
     }
 
 }
