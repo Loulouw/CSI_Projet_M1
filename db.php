@@ -268,4 +268,27 @@ class db
         return $abonnements;
     }
 
+    function getStatusUtilisateur($idUtilisateur)
+    {
+        $utilisateur = ORM::for_table('utilisateur')->where('id', $idUtilisateur)->findOne();
+        return ORM::for_table('statusutilisateur')->where('id', $utilisateur->idstatusutilisateur)->findOne();
+    }
+
+    function changementMotDePasse($idUtilisateur, $ancienMdp, $nouveauMdp, $confirmationMdp)
+    {
+        $utilisateur = ORM::for_table('utilisateur')->where('id', $idUtilisateur)->findOne();
+        $connexion = ORM::for_table('connexion')->where('id', $utilisateur->idconnexion)->findOne();
+        $message = "";
+        if (strlen($nouveauMdp) >= 4 && strcmp($nouveauMdp, $confirmationMdp) === 0) {
+            if (password_verify($ancienMdp, $connexion->motdepasse)) {
+                $connexion->motdepasse = $this->better_crypt($nouveauMdp);
+                $connexion->save();
+            } else {
+                $message = "L'ancien mot de passe n'est pas le bon";
+            }
+        } else {
+            $message = "La confirmation ne correspond pas au nouveau mot de passe, celui ci doit faire 4 caractère minimum";
+        }
+        return $message;
+    }
 }
