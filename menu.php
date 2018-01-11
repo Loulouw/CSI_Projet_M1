@@ -14,6 +14,9 @@
                 <li><a href="index.php">Accueil</a></li>
                 <?php
                     if(isset($_SESSION['utilisateur'])){
+                        if($_SESSION['utilisateur']->idstatusutilisateur == 1){
+                            echo "<li><a href='gestionActiviteAdministrateur.php'>Administration</a></li>";
+                        }
                         echo "<li><a href='vueGeneralCompte.php'>Mon compte</a></li>";
                         echo "<li><a href='deconnexion.php'>Deconnexion</a></li>";
                     }else{

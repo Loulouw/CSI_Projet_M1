@@ -291,4 +291,26 @@ class db
         }
         return $message;
     }
+
+    function getActivites(){
+        return ORM::for_table("activite")->orderByAsc("libelle")->findMany();
+    }
+
+    function getActivite($nomActivite){
+        return ORM::for_table("activite")->where('libelle',$nomActivite)->findOne();
+    }
+
+    function updateActiviteArchive($idActivite){
+        $activite = ORM::for_table("activite")->where("id",$idActivite)->findOne();
+        $activite->archive = !$activite->archive;
+        $activite->save();
+    }
+
+    function ajoutActivite($nomActivite){
+        $activite = ORM::for_table("activite")->create();
+        $activite->id = $this->getLastId("activite");
+        $activite->libelle = $nomActivite;
+        $activite->archive = false;
+        $activite->save();
+    }
 }
