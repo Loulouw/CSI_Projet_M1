@@ -17,7 +17,7 @@
                 <li>
                     <a href="gestionCompteInactifAdministrateur.php">
                         <i class="glyphicon glyphicon-user"></i>
-                        Gestion abonnement </a>
+                        Gestion utilisateur </a>
                 </li>
             </ul>
         </div>
