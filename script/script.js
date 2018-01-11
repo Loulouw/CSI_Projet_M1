@@ -11,9 +11,9 @@ $(document).ready(function () {
     $("#modal1ab").click(function () {
         $("#modal1a").modal("show");
     });
-
+    $("#modalAjoutEmployeb").click(function () {
+        $("#modalAjoutEmploye").modal("show");
+    });
 });
 
-function showModalActivite(){
-    $("#modalAjoutActivite").modal("show");
-}
+

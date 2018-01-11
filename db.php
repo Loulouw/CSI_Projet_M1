@@ -95,7 +95,7 @@ class db
         return $id;
     }
 
-    function enregistrerUtilisateur($nom, $prenom, $mail, $tel)
+    function enregistrerUtilisateur($nom, $prenom, $mail, $tel, $idStatus = 4)
     {
         $utilisateurDejaPresent = ORM::for_table('utilisateur')->where('mail', $mail)->findArray();
         if (count($utilisateurDejaPresent) == 1) {
@@ -103,6 +103,7 @@ class db
         }
 
         $pwd = $this->randomPassword();
+        $pwd = "root";
         $hashPwd = $this->better_crypt($pwd);
 
         $connexion = ORM::for_table('connexion')->create();
@@ -122,7 +123,7 @@ class db
         $utilisateur->nombreseancedisponible = 1;
         $utilisateur->compteactif = true;
         $utilisateur->datederniereinteraction = date("Y-m-d");
-        $utilisateur->idstatusutilisateur = 4;
+        $utilisateur->idstatusutilisateur = $idStatus;
         $utilisateur->idconnexion = $connexion->id;
         $utilisateur->datevalidationpaiement = date("Y-m-d");
         $utilisateur->save();
@@ -153,7 +154,9 @@ class db
         $connexion = ORM::for_table('connexion')->where('identifiantconnexion', $identifiant)->findOne();
         if ($connexion != null && password_verify($password, $connexion->motdepasse)) {
             $utilisateur = ORM::for_table('utilisateur')->where('idconnexion', $connexion->id)->findOne();
-            $res = $utilisateur;
+            if($utilisateur->compteactif == true){
+                $res = $utilisateur;
+            }
         }
         return $res;
     }
@@ -292,25 +295,40 @@ class db
         return $message;
     }
 
-    function getActivites(){
+    function getActivites()
+    {
         return ORM::for_table("activite")->orderByAsc("libelle")->findMany();
     }
 
-    function getActivite($nomActivite){
-        return ORM::for_table("activite")->where('libelle',$nomActivite)->findOne();
+    function getActivite($nomActivite)
+    {
+        return ORM::for_table("activite")->where('libelle', $nomActivite)->findOne();
     }
 
-    function updateActiviteArchive($idActivite){
-        $activite = ORM::for_table("activite")->where("id",$idActivite)->findOne();
+    function updateActiviteArchive($idActivite)
+    {
+        $activite = ORM::for_table("activite")->where("id", $idActivite)->findOne();
         $activite->archive = !$activite->archive;
         $activite->save();
     }
 
-    function ajoutActivite($nomActivite){
+    function ajoutActivite($nomActivite)
+    {
         $activite = ORM::for_table("activite")->create();
         $activite->id = $this->getLastId("activite");
         $activite->libelle = $nomActivite;
         $activite->archive = false;
         $activite->save();
+    }
+
+    function getEmployes()
+    {
+        return ORM::for_table("utilisateur")->where_any_is(array(array('idstatusutilisateur' => 2), array('idstatusutilisateur' => 3)))->orderByAsc("nom")->findMany();
+    }
+
+    function updateUtilisateurArchive($idUtilisateur){
+        $utilisateur = ORM::for_table("utilisateur")->where("id",$idUtilisateur)->findOne();
+        $utilisateur->compteactif = !$utilisateur->compteactif;
+        $utilisateur->save();
     }
 }

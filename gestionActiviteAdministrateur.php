@@ -91,7 +91,7 @@ if (isset($_POST['nouvelleActiviteeSend'])) {
                                 echo "<tr>";
                                 echo "<td>" . $a->libelle . "</td>";
                                 echo "<td>" . $actif . "</td>";
-                                echo "<td><input type='submit' class='btn btn-default btn-block' name='updateEtatActivite' value='Changer État'></td>";
+                                echo "<td><input type='submit' class='btn btn-default btn-block' name='updateEtatActivite' value='Changer Status'></td>";
                                 echo "</tr>";
                                 echo "</form>";
                             }
