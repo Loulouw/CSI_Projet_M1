@@ -331,4 +331,27 @@ class db
         $utilisateur->compteactif = !$utilisateur->compteactif;
         $utilisateur->save();
     }
+
+    function getCompteActifNeedToBeNonActif(){
+        $res = array();
+        $listeUtilisateurs = ORM::for_table("utilisateur")->orderByDesc("compteactif")->orderByAsc("nom")->findMany();
+        $dateMin = date('Y-m-d', strtotime(date("Y-m-d") . ' - 365 days'));
+        foreach ($listeUtilisateurs as $u){
+            if(strtotime($u->datederniereinteraction) <= strtotime($dateMin)){
+                array_push($res,$u);
+            }
+        }
+        return $res;
+    }
+
+    function updateAllUtilisateurToNonActif(){
+        $listeUtilisateursActif  = ORM::for_table("utilisateur")->where("compteactif",true)->findMany();
+        $dateMin = date('Y-m-d', strtotime(date("Y-m-d") . ' - 365 days'));
+        foreach ($listeUtilisateursActif as $u){
+            if(strtotime($u->datederniereinteraction) <= strtotime($dateMin)){
+                $u->compteactif=false;
+                $u->save();
+            }
+        }
+    }
 }
