@@ -10,6 +10,12 @@
                         Activités </a>
                 </li>
                 <li>
+                    <a href="gestionSeanceAdministrateur.php">
+                        <i class="glyphicon glyphicon-th-list"></i>
+                        Séances
+                    </a>
+                </li>
+                <li>
                     <a href="gestionEmployeAdministrateur.php">
                         <i class="glyphicon glyphicon-briefcase"></i>
                         Employés </a>
@@ -17,8 +23,9 @@
                 <li>
                     <a href="gestionCompteInactifAdministrateur.php">
                         <i class="glyphicon glyphicon-user"></i>
-                        Gestion utilisateur </a>
+                        Gestion utilisateurs </a>
                 </li>
+
             </ul>
         </div>
         <!-- END MENU -->

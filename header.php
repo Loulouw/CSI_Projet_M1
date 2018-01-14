@@ -10,6 +10,8 @@
     <meta name="description" content="">
     <meta name="author" content="">
     <title>Salle de Sport</title>
+    <link href="css/jquery-ui.min.css" rel="stylesheet">
+    <link href="css/jquery.timepicker.min.css" rel="stylesheet">
     <link href="css/bootstrap.min.css" rel="stylesheet">
     <link href="css/font-awesome.min.css" rel="stylesheet">
     <link href="css/main.css" rel="stylesheet">

@@ -305,6 +305,10 @@ class db
         return ORM::for_table("activite")->where('libelle', $nomActivite)->findOne();
     }
 
+    function getActiviteWithId($id){
+        return ORM::for_table("activite")->where("id",$id)->findOne();
+    }
+
     function updateActiviteArchive($idActivite)
     {
         $activite = ORM::for_table("activite")->where("id", $idActivite)->findOne();
@@ -327,7 +331,7 @@ class db
     }
 
     function updateUtilisateurArchive($idUtilisateur){
-        $utilisateur = ORM::for_table("utilisateur")->where("id",$idUtilisateur)->findOne();
+        $utilisateur = $this->getUtilisateur($idUtilisateur);
         $utilisateur->compteactif = !$utilisateur->compteactif;
         $utilisateur->save();
     }
@@ -353,5 +357,36 @@ class db
                 $u->save();
             }
         }
+    }
+
+    function getAllSeanceNonCommencee(){
+        $listeSeance = ORM::for_table("seance")->whereGt('datedebut',date("Y-m-d h:i"))->findMany();
+        return $listeSeance;
+    }
+
+    function getUtilisateur($id){
+        return ORM::for_table("utilisateur")->where("id",$id)->find_one();
+    }
+
+    function getPlaceRestantForSeance($idSeance){
+        $seance = ORM::for_table("seance")->where("id",$idSeance)->findOne();
+        $listeParticipant = ORM::for_table("utilisateurtoseance")->where("idseance",$idSeance)->where("participe",true)->findArray();
+        return $seance->nbplace - count($listeParticipant);
+    }
+
+    function supprimerSeance($idSeance){
+        $seance = ORM::for_table("seance")->where("id",$idSeance)->findOne();
+        $seance->delete();
+        $listeParticipant = ORM::for_table("utilisateurtoseance")->where("idseance",$idSeance)->where("participe",true)->findArray();
+        foreach ($listeParticipant as $p){
+            if(strcmp($p->typepaiement,"unite" == 0)){
+                $u = $this->getUtilisateur($p->idutilisateur);
+                $u->nombreseancedisponible = $u->nombreseancedisponible + 1;
+            }
+        }
+    }
+
+    function getCoachs(){
+        return ORM::for_table("utilisateur")->where("idstatusutilisateur",3)->findMany();
     }
 }

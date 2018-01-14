@@ -14,6 +14,15 @@ $(document).ready(function () {
     $("#modalAjoutEmployeb").click(function () {
         $("#modalAjoutEmploye").modal("show");
     });
+    $("#modalAjoutSeanceb").click(function () {
+        $("#modalAjoutSeance").modal("show");
+    });
+
+    $('#dateDebut').datepicker({"dateFormat": "yy-mm-dd "});
+    $('#heureDebut').timepicker({ 'timeFormat': 'H:i:s' });
+
+    $('#dateFin').datepicker({"dateFormat": "yy-mm-dd "});
+    $('#heureFin').timepicker({ 'timeFormat': 'H:i:s' });
 });
 
 
