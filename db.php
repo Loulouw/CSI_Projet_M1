@@ -154,7 +154,7 @@ class db
         $connexion = ORM::for_table('connexion')->where('identifiantconnexion', $identifiant)->findOne();
         if ($connexion != null && password_verify($password, $connexion->motdepasse)) {
             $utilisateur = ORM::for_table('utilisateur')->where('idconnexion', $connexion->id)->findOne();
-            if($utilisateur->compteactif == true){
+            if ($utilisateur->compteactif == true) {
                 $res = $utilisateur;
             }
         }
@@ -305,8 +305,9 @@ class db
         return ORM::for_table("activite")->where('libelle', $nomActivite)->findOne();
     }
 
-    function getActiviteWithId($id){
-        return ORM::for_table("activite")->where("id",$id)->findOne();
+    function getActiviteWithId($id)
+    {
+        return ORM::for_table("activite")->where("id", $id)->findOne();
     }
 
     function updateActiviteArchive($idActivite)
@@ -330,63 +331,121 @@ class db
         return ORM::for_table("utilisateur")->where_any_is(array(array('idstatusutilisateur' => 2), array('idstatusutilisateur' => 3)))->orderByAsc("nom")->findMany();
     }
 
-    function updateUtilisateurArchive($idUtilisateur){
+    function updateUtilisateurArchive($idUtilisateur)
+    {
         $utilisateur = $this->getUtilisateur($idUtilisateur);
         $utilisateur->compteactif = !$utilisateur->compteactif;
         $utilisateur->save();
     }
 
-    function getCompteActifNeedToBeNonActif(){
+    function getCompteActifNeedToBeNonActif()
+    {
         $res = array();
         $listeUtilisateurs = ORM::for_table("utilisateur")->orderByDesc("compteactif")->orderByAsc("nom")->findMany();
         $dateMin = date('Y-m-d', strtotime(date("Y-m-d") . ' - 365 days'));
-        foreach ($listeUtilisateurs as $u){
-            if(strtotime($u->datederniereinteraction) <= strtotime($dateMin)){
-                array_push($res,$u);
+        foreach ($listeUtilisateurs as $u) {
+            if (strtotime($u->datederniereinteraction) <= strtotime($dateMin)) {
+                array_push($res, $u);
             }
         }
         return $res;
     }
 
-    function updateAllUtilisateurToNonActif(){
-        $listeUtilisateursActif  = ORM::for_table("utilisateur")->where("compteactif",true)->findMany();
+    function updateAllUtilisateurToNonActif()
+    {
+        $listeUtilisateursActif = ORM::for_table("utilisateur")->where("compteactif", true)->findMany();
         $dateMin = date('Y-m-d', strtotime(date("Y-m-d") . ' - 365 days'));
-        foreach ($listeUtilisateursActif as $u){
-            if(strtotime($u->datederniereinteraction) <= strtotime($dateMin)){
-                $u->compteactif=false;
+        foreach ($listeUtilisateursActif as $u) {
+            if (strtotime($u->datederniereinteraction) <= strtotime($dateMin)) {
+                $u->compteactif = false;
                 $u->save();
             }
         }
     }
 
-    function getAllSeanceNonCommencee(){
-        $listeSeance = ORM::for_table("seance")->whereGt('datedebut',date("Y-m-d h:i"))->findMany();
+    function getAllSeanceNonCommencee()
+    {
+        $listeSeance = ORM::for_table("seance")->whereGt('datedebut', date("Y-m-d h:i"))->findMany();
         return $listeSeance;
     }
 
-    function getUtilisateur($id){
-        return ORM::for_table("utilisateur")->where("id",$id)->find_one();
+    function getUtilisateur($id)
+    {
+        return ORM::for_table("utilisateur")->where("id", $id)->find_one();
     }
 
-    function getPlaceRestantForSeance($idSeance){
-        $seance = ORM::for_table("seance")->where("id",$idSeance)->findOne();
-        $listeParticipant = ORM::for_table("utilisateurtoseance")->where("idseance",$idSeance)->where("participe",true)->findArray();
+    function getPlaceRestantForSeance($idSeance)
+    {
+        $seance = ORM::for_table("seance")->where("id", $idSeance)->findOne();
+        $listeParticipant = ORM::for_table("utilisateurtoseance")->where("idseance", $idSeance)->where("participe", true)->findArray();
         return $seance->nbplace - count($listeParticipant);
     }
 
-    function supprimerSeance($idSeance){
-        $seance = ORM::for_table("seance")->where("id",$idSeance)->findOne();
+    function supprimerSeance($idSeance)
+    {
+        $seance = ORM::for_table("seance")->where("id", $idSeance)->findOne();
         $seance->delete();
-        $listeParticipant = ORM::for_table("utilisateurtoseance")->where("idseance",$idSeance)->where("participe",true)->findArray();
-        foreach ($listeParticipant as $p){
-            if(strcmp($p->typepaiement,"unite" == 0)){
+        $listeParticipant = ORM::for_table("utilisateurtoseance")->where("idseance", $idSeance)->where("participe", true)->findArray();
+        foreach ($listeParticipant as $p) {
+            if (strcmp($p->typepaiement, "unite" == 0)) {
                 $u = $this->getUtilisateur($p->idutilisateur);
                 $u->nombreseancedisponible = $u->nombreseancedisponible + 1;
             }
         }
     }
 
-    function getCoachs(){
-        return ORM::for_table("utilisateur")->where("idstatusutilisateur",3)->findMany();
+    function getCoachs()
+    {
+        return ORM::for_table("utilisateur")->where("idstatusutilisateur", 3)->findMany();
+    }
+
+    function getUtilisateurByMail($mail)
+    {
+        return ORM::for_table("utilisateur")->where("mail", $mail)->findOne();
+    }
+
+    function getAllSeanceCoachNonPassee($idCoach)
+    {
+        return ORM::for_table("seance")->whereGt('datedebut', date("Y-m-d h:i"))->where("idutilisateurcoach", $idCoach)->findMany();
+    }
+
+    function saveSeance($idActivite, $idCoach, $dateDebut, $dateFin, $nbPlace, $prix)
+    {
+        $message = "";
+
+        if (strtotime($dateDebut) < strtotime(date("Y-m-d H:i:s"))) {
+            $message = "La date de début doit être supérieur à la date actuelle";
+        } else if (strtotime($dateDebut) > strtotime($dateFin)) {
+            $message = "La date de début doit être avant la date de fin";
+        } else if (!is_null($idCoach)) {
+            foreach ($this->getAllSeanceCoachNonPassee($idCoach) as $s) {
+                $td1 = strtotime($dateDebut);
+                $tf1 = strtotime($dateFin);
+                $td2 = strtotime($s->datedebut);
+                $tf2 = strtotime($s->datefin);
+                if (!(($td1 > $tf2) || ($tf1 < $td2))) {
+                    $message = "Le coach est déjà pris pour cette période";
+                    break;
+                }
+            }
+        } else if ($nbPlace < 1) {
+            $message = "Le nombre de place doit être de 1 minimum";
+        } else if ($prix < 0) {
+            $message = "Le prix ne peut être négatif";
+        }
+
+        if (strcmp($message, "") == 0) {
+            $seance = ORM::for_table("seance")->create();
+            $seance->id = $this->getLastId("seance");
+            $seance->datedebut = $dateDebut;
+            $seance->datefin = $dateFin;
+            $seance->nbplace = $nbPlace;
+            $seance->prix = $prix;
+            $seance->idactivite = $idActivite;
+            $seance->idutilisateurcoach = $idCoach;
+            $seance->save();
+        }
+
+        return $message;
     }
 }
