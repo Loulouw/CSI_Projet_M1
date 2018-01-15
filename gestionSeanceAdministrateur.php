@@ -83,7 +83,7 @@
 
                                         <div class="col-md-12">
                                             <div class="form-group">
-                                                <label for="prix" class="control-label">Coach (Facultatif)</label>
+                                                <label for="coach" class="control-label">Coach (Facultatif)</label>
                                                 <select class="form-control" name="coach" id="coach">
                                                     <option>-</option>
                                                     <?php

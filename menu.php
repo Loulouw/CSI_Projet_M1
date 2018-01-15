@@ -14,7 +14,11 @@
                 <li><a href="index.php">Accueil</a></li>
                 <?php
                     if(isset($_SESSION['utilisateur'])){
-                        if($_SESSION['utilisateur']->idstatusutilisateur == 1){
+                        $rang = $_SESSION['utilisateur']->idstatusutilisateur;
+                        if($rang <= 2){
+                            echo "<li><a href='gestionPlanningClientEmploye.php'>Employé</a></li>";
+                        }
+                        if($rang == 1){
                             echo "<li><a href='gestionActiviteAdministrateur.php'>Administration</a></li>";
                         }
                         echo "<li><a href='vueGeneralCompte.php'>Mon compte</a></li>";

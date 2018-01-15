@@ -91,7 +91,7 @@ class db
 
     function getLastId($table)
     {
-        $id = ORM::for_table($table)->count() + 1;
+        $id = ORM::for_table($table)->max('id') + 1;
         return $id;
     }
 
@@ -442,6 +442,33 @@ class db
             $seance->nbplace = $nbPlace;
             $seance->prix = $prix;
             $seance->idactivite = $idActivite;
+            $seance->idutilisateurcoach = $idCoach;
+            $seance->save();
+        }
+
+        return $message;
+    }
+
+    function updateCoachOnSeance($idSeance, $idCoach)
+    {
+        $message = "";
+        $seance = ORM::for_table("seance")->where("id", $idSeance)->findOne();
+        if (!is_null($idCoach) && $seance->idutilisateurcoach != $idCoach) {
+
+            foreach ($this->getAllSeanceCoachNonPassee($idCoach) as $s) {
+                if ($s->id != $idSeance) {
+                    $td1 = strtotime($seance->datedebut);
+                    $tf1 = strtotime($seance->datefin);
+                    $td2 = strtotime($s->datedebut);
+                    $tf2 = strtotime($s->datefin);
+                    if (!(($td1 > $tf2) || ($tf1 < $td2))) {
+                        $message = "Le coach est déjà pris pour cette période";
+                        break;
+                    }
+                }
+            }
+        }
+        if (strcmp($message, "") == 0) {
             $seance->idutilisateurcoach = $idCoach;
             $seance->save();
         }

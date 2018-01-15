@@ -25,4 +25,8 @@ $(document).ready(function () {
     $('#heureFin').timepicker({ 'timeFormat': 'H:i:s' });
 });
 
+function showModalCoach(idCoach){
+    $('#idCoachModal').val(idCoach);
+    $("#modalModifCoach").modal("show");
+}
 
