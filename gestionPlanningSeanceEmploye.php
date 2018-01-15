@@ -106,7 +106,6 @@
                             </tbody>
                         </table>
                     </div>
-                    </divrow>
                 </div>
             </div>
         </div>

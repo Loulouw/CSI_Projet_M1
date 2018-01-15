@@ -369,6 +369,12 @@ class db
         return $listeSeance;
     }
 
+    function getAllSeanceNonCommenceeCoach($idCoach)
+    {
+        $listeSeance = ORM::for_table("seance")->where("idutilisateurcoach",$idCoach)->whereGt('datedebut', date("Y-m-d h:i"))->findMany();
+        return $listeSeance;
+    }
+
     function getUtilisateur($id)
     {
         return ORM::for_table("utilisateur")->where("id", $id)->find_one();
