@@ -405,6 +405,10 @@ class db
         return ORM::for_table("utilisateur")->where("idstatusutilisateur", 3)->findMany();
     }
 
+    function getClients(){
+        return ORM::for_table("utilisateur")->where("idstatusutilisateur",4)->findMany();
+    }
+
     function getUtilisateurByMail($mail)
     {
         return ORM::for_table("utilisateur")->where("mail", $mail)->findOne();
@@ -413,6 +417,10 @@ class db
     function getAllSeanceCoachNonPassee($idCoach)
     {
         return ORM::for_table("seance")->whereGt('datedebut', date("Y-m-d h:i"))->where("idutilisateurcoach", $idCoach)->findMany();
+    }
+
+    function getAllSeanceNonCommenceeClient($idClient){
+        return ORM::for_table("utilisateurtoseance")->where("participe",true)->where("idutilisateur",$idClient)->findMany();
     }
 
     function saveSeance($idActivite, $idCoach, $dateDebut, $dateFin, $nbPlace, $prix)
@@ -480,5 +488,9 @@ class db
         }
 
         return $message;
+    }
+
+    function getSeance($idSeance){
+        return ORM::for_table("seance")->where("id",$idSeance)->findOne();
     }
 }
