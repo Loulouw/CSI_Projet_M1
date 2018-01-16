@@ -17,6 +17,10 @@ $(document).ready(function () {
     $("#modalAjoutSeanceb").click(function () {
         $("#modalAjoutSeance").modal("show");
     });
+    $("#ajoutSeanceClient").click(function () {
+        $("#modalAjoutSeanceClient").modal("show");
+    });
+
 
     $('#dateDebut').datepicker({"dateFormat": "yy-mm-dd "});
     $('#heureDebut').timepicker({ 'timeFormat': 'H:i:s' });

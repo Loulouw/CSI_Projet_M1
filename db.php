@@ -369,9 +369,40 @@ class db
         return $listeSeance;
     }
 
+    function getAllSeanceNonCommenceeDisponible()
+    {
+        $res = array();
+        $listeSeance = ORM::for_table("seance")->whereGt('datedebut', date("Y-m-d h:i"))->findMany();
+        foreach ($listeSeance as $s) {
+            if ($this->getPlaceRestantForSeance($s->id) > 0) {
+                array_push($res, $s);
+            }
+        }
+        return $res;
+    }
+
+    function getAllSeanceNonCommenceeDisponibleClient($idClient)
+    {
+        $res = array();
+        $arrayIds = array();
+        $seances = $this->getAllSeanceNonCommenceeClient($idClient);
+
+        foreach ($seances as $s) {
+            array_push($arrayIds, $this->getseance($s->idseance)->id);
+        }
+
+
+        foreach ($this->getAllSeanceNonCommenceeDisponible() as $s) {
+            if (!in_array($s->id, $arrayIds)) {
+                array_push($res, $s);
+            }
+        }
+        return $res;
+    }
+
     function getAllSeanceNonCommenceeCoach($idCoach)
     {
-        $listeSeance = ORM::for_table("seance")->where("idutilisateurcoach",$idCoach)->whereGt('datedebut', date("Y-m-d h:i"))->findMany();
+        $listeSeance = ORM::for_table("seance")->where("idutilisateurcoach", $idCoach)->whereGt('datedebut', date("Y-m-d h:i"))->findMany();
         return $listeSeance;
     }
 
@@ -393,7 +424,7 @@ class db
         $seance->delete();
         $listeParticipant = ORM::for_table("utilisateurtoseance")->where("idseance", $idSeance)->where("participe", true)->findArray();
         foreach ($listeParticipant as $p) {
-            if (strcmp($p->typepaiement, "unite" == 0)) {
+            if (strcmp($p->typepaiement, "unite") == 0) {
                 $u = $this->getUtilisateur($p->idutilisateur);
                 $u->nombreseancedisponible = $u->nombreseancedisponible + 1;
             }
@@ -402,11 +433,12 @@ class db
 
     function getCoachs()
     {
-        return ORM::for_table("utilisateur")->where("idstatusutilisateur", 3)->findMany();
+        return ORM::for_table("utilisateur")->where("idstatusutilisateur", 3)->orderByAsc("nom")->findMany();
     }
 
-    function getClients(){
-        return ORM::for_table("utilisateur")->where("idstatusutilisateur",4)->findMany();
+    function getClients()
+    {
+        return ORM::for_table("utilisateur")->where("idstatusutilisateur", 4)->orderByAsc("nom")->findMany();
     }
 
     function getUtilisateurByMail($mail)
@@ -419,8 +451,9 @@ class db
         return ORM::for_table("seance")->whereGt('datedebut', date("Y-m-d h:i"))->where("idutilisateurcoach", $idCoach)->findMany();
     }
 
-    function getAllSeanceNonCommenceeClient($idClient){
-        return ORM::for_table("utilisateurtoseance")->where("participe",true)->where("idutilisateur",$idClient)->findMany();
+    function getAllSeanceNonCommenceeClient($idClient)
+    {
+        return ORM::for_table("utilisateurtoseance")->where("participe", true)->where("idutilisateur", $idClient)->findMany();
     }
 
     function saveSeance($idActivite, $idCoach, $dateDebut, $dateFin, $nbPlace, $prix)
@@ -490,7 +523,37 @@ class db
         return $message;
     }
 
-    function getSeance($idSeance){
-        return ORM::for_table("seance")->where("id",$idSeance)->findOne();
+    function getSeance($idSeance)
+    {
+        return ORM::for_table("seance")->where("id", $idSeance)->findOne();
+    }
+
+    function deleteSeanceClient($idClient, $idSeance)
+    {
+        $us = ORM::for_table("utilisateurtoseance")->where("idutilisateur", $idClient)->where("idseance", $idSeance)->where("participe", true)->findOne();
+        $us->participe = false;
+        $us->save();
+        if (strcmp($us->typepaiement, "unite") == 0) {
+            $u = $this->getUtilisateur($idClient);
+            $u->nombreseancedisponible = $u->nombreseancedisponible + 1;
+            $u->save();
+        }
+    }
+
+    function ajoutClientToSeance($idClient, $idSeance, $typepaiement)
+    {
+        $us = ORM::for_table("utilisateurtoseance")->create();
+        $us->id = $this->getLastId("utilisateurtoseance");
+        $us->idutilisateur = $idClient;
+        $us->idseance = $idSeance;
+        $us->participe = true;
+        $us->typepaiement = $typepaiement;
+        $us->save();
+
+        if (strcmp($typepaiement, "unite") == 0) {
+            $u = $this->getUtilisateur($idClient);
+            $u->nombreseancedisponible = $u->nombreseancedisponible - 1;
+            $u->save();
+        }
     }
 }
