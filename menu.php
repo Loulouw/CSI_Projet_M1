@@ -15,6 +15,9 @@
                 <?php
                     if(isset($_SESSION['utilisateur'])){
                         $rang = $_SESSION['utilisateur']->idstatusutilisateur;
+                        if($rang == 3){
+                            echo "<li><a href='gestionPlanningCoach.php'>Coach</a></li>";
+                        }
                         if($rang <= 2){
                             echo "<li><a href='gestionPlanningClientEmploye.php'>Employé</a></li>";
                         }

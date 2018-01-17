@@ -556,4 +556,9 @@ class db
             $u->save();
         }
     }
+
+    function getUtilisateurForSeance($idSeance)
+    {
+        return ORM::for_table("utilisateur")->join("utilisateurtoseance", array('utilisateur.id', '=', 'utilisateurtoseance.idutilisateur'))->where("utilisateurtoseance.participe", true)->where("utilisateurtoseance.idseance", $idSeance)->findMany();
+    }
 }
