@@ -69,7 +69,7 @@ if (isset($_POST['nouvelleActiviteeSend'])) {
                     </div>
                     <div class="col-md-4">
                         <button id="modalActiviteb" class="btn btn-success btn-block" type="button">
-                            Ajouter une Activité
+                            Ajouter une activité
                         </button>
                     </div>
                     <div class="col-md-12">

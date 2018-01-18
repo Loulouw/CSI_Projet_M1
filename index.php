@@ -30,7 +30,7 @@
             <div class="col-lg-4">
                 <i class="fa fa-trophy"></i>
                 <h4>Gagner</h4>
-                <p>Nos activités sont encadrées par des coach qui vous permettrons d'atteindre vos objectif et de
+                <p>Nos activités sont encadrées par des coachs qui vous permettront d'atteindre vos objectifs et de
                     réaliser vos rêves</p>
             </div><!-- col-lg-4 -->
 

@@ -28,7 +28,7 @@
                             echo "<li><a href='gestionActiviteAdministrateur.php'>Administration</a></li>";
                         }
                         echo "<li><a href='vueGeneralCompte.php'>Mon compte</a></li>";
-                        echo "<li><a href='deconnexion.php'>Deconnexion</a></li>";
+                        echo "<li><a href='deconnexion.php'>Déconnexion</a></li>";
                     }else{
                         echo "<li><a href='connexion.php'>Connexion/Inscription</a></li>";
                     }

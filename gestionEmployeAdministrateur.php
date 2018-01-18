@@ -81,7 +81,7 @@
                                 </div>
                                 <div class="modal-footer">
                                     <button id="buttonAjoutEmploye" type="submit" name="ajoutEmployeSend"
-                                            class="btn btn-success">Ajouter l'employe
+                                            class="btn btn-success">Ajouter l'employé
                                     </button>
                                 </div>
                             </form>
