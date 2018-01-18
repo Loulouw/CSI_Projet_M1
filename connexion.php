@@ -47,7 +47,7 @@
                     <p class="lead">Inscrivez vous maintenant pour seulement <span class="text-success">20 €</span></p>
                     <ul class="list-unstyled" style="line-height: 2">
                         <li><span class="fa fa-check text-success"></span> Réservez en ligne</li>
-                        <li><span class="fa fa-check text-success"></span> Accéder à nos activitées</li>
+                        <li><span class="fa fa-check text-success"></span> Accéder à nos activités</li>
                         <li><span class="fa fa-check text-success"></span> Faites vous coacher</li>
                         <li><span class="fa fa-check text-success"></span> 1 séance gratuite
                             <small>(Seulement pour les nouveaux membres)</small>

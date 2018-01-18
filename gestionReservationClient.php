@@ -38,7 +38,7 @@
                             <div class="row">
                                 <div class="col-md-12">
                                     <div class="form-group">
-                                        <label for="activite" class="control-label"><h3>Liste Activitées</h3></label>
+                                        <label for="activite" class="control-label"><h3>Liste Activités</h3></label>
                                         <select class="form-control" name="activite" id="activite"
                                                 onchange="this.form.submit();">
                                             <?php

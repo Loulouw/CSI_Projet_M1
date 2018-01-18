@@ -71,7 +71,7 @@
                                     <h4 class="card-title">
                                         <a href="#">Abonnement annuel</a>
                                     </h4>
-                                    <p class="card-text text-justify">C'est labonnement ultime, il vous permettra de
+                                    <p class="card-text text-justify">C'est l'abonnement ultime, il vous permettra de
                                         profiter de votre salle de sport toute l'année et pour seulement 230€ soit 19€
                                         par mois !</p>
                                 </div>

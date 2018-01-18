@@ -13,7 +13,7 @@ if (isset($_POST['nouvelleActiviteeSend'])) {
         $db->ajoutActivite($_POST['nomActivite']);
         $messageActivite = "OK";
     } else {
-        $messageActivite = "Une activitée portant le même nom existe déjà";
+        $messageActivite = "Une activité portant le même nom existe déjà";
     }
 }
 ?>
@@ -27,7 +27,7 @@ if (isset($_POST['nouvelleActiviteeSend'])) {
             <div class="modal-dialog" role="document">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h3 class="modal-title">Ajouter une activitée</h3>
+                        <h3 class="modal-title">Ajouter une activité</h3>
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                             <span aria-hidden="true">&times;</span>
                         </button>
@@ -35,10 +35,10 @@ if (isset($_POST['nouvelleActiviteeSend'])) {
                     <form id="activiteForm" method="post">
                         <div class="modal-body">
                             <div class="form-group" style="display:inline">
-                                <label for="nomActivite" class="control-label">Nom de l'activitée</label>
+                                <label for="nomActivite" class="control-label">Nom de l'activité</label>
                                 <input type="text" class="form-control" id="nomActivite" name="nomActivite" value=""
                                        required=""
-                                       title="Nom de l'activitée">
+                                       title="Nom de l'activité">
                             </div>
 
                         </div>
@@ -58,18 +58,18 @@ if (isset($_POST['nouvelleActiviteeSend'])) {
                     <div class="col-md-12">
                         <?php
                         if (strcmp($messageActivite, "OK") == 0) {
-                            echo "<div class=\"alert alert-success\">L'activitée " . $_POST['nomActivite'] . " a été ajoutée</div>";
+                            echo "<div class=\"alert alert-success\">L'activité " . $_POST['nomActivite'] . " a été ajoutée</div>";
                         } else if (strcmp($messageActivite, "") != 0) {
                             echo "<div class=\"alert alert-danger\">" . $messageActivite . "</div>";
                         }
                         ?>
                     </div>
                     <div class="col-md-8">
-                        <h3>Liste des activitées</h3>
+                        <h3>Liste des activités</h3>
                     </div>
                     <div class="col-md-4">
                         <button id="modalActiviteb" class="btn btn-success btn-block" type="button">
-                            Ajouter une Activitée
+                            Ajouter une Activité
                         </button>
                     </div>
                     <div class="col-md-12">

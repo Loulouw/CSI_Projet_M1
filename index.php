@@ -16,8 +16,8 @@
             <br><br>
             <div class="col-lg-4">
                 <i class="fa fa-heart"></i>
-                <h4>Activitées</h4>
-                <p>Grâce à notre multitude d'activitées, vous trouverez votre bonheur dans notre salle de sport</p>
+                <h4>Activités</h4>
+                <p>Grâce à notre multitude d'activités, vous trouverez votre bonheur dans notre salle de sport</p>
             </div><!-- col-lg-4 -->
 
             <div class="col-lg-4">
@@ -30,13 +30,13 @@
             <div class="col-lg-4">
                 <i class="fa fa-trophy"></i>
                 <h4>Gagner</h4>
-                <p>Nos activitées sont encadrées par des coach qui vous permettrons d'atteindre vos objectif et de
+                <p>Nos activités sont encadrées par des coach qui vous permettrons d'atteindre vos objectif et de
                     réaliser vos rêves</p>
             </div><!-- col-lg-4 -->
 
             <div class="col-md-12">
                 <hr>
-                <h3>Liste des activitées disponibles</h3><br><br>
+                <h3>Liste des activités disponibles</h3><br><br>
                 <?php
                 echo "<div class='row'>";
                 foreach ($db->getActiviteActive() as $a) {
