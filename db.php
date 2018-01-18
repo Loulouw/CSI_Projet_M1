@@ -406,6 +406,12 @@ class db
         return $listeSeance;
     }
 
+    function getAllSeanceNonCommenceeActivite($idActivite)
+    {
+        $listeSeance = ORM::for_table("seance")->where("idactivite", $idActivite)->whereGt('datedebut', date("Y-m-d h:i"))->orderByAsc('datedebut')->findMany();
+        return $listeSeance;
+    }
+
     function getUtilisateur($id)
     {
         return ORM::for_table("utilisateur")->where("id", $id)->find_one();
@@ -415,6 +421,7 @@ class db
     {
         $seance = ORM::for_table("seance")->where("id", $idSeance)->findOne();
         $listeParticipant = ORM::for_table("utilisateurtoseance")->where("idseance", $idSeance)->where("participe", true)->findArray();
+
         return $seance->nbplace - count($listeParticipant);
     }
 
@@ -560,5 +567,99 @@ class db
     function getUtilisateurForSeance($idSeance)
     {
         return ORM::for_table("utilisateur")->join("utilisateurtoseance", array('utilisateur.id', '=', 'utilisateurtoseance.idutilisateur'))->where("utilisateurtoseance.participe", true)->where("utilisateurtoseance.idseance", $idSeance)->findMany();
+    }
+
+    function getSeancePasseeClient($idClient)
+    {
+        $res = array();
+        $usList = ORM::for_table("utilisateurtoseance")->where("participe", true)->where("idutilisateur", $idClient)->findMany();
+        foreach ($usList as $us) {
+            $seance = ORM::for_table("seance")->where("id", $us->idseance)->where_lt('datedebut', date("Y-m-d h:i"))->findOne();
+            if ($seance != false) {
+                array_push($res, $seance);
+            }
+        }
+        return $res;
+    }
+
+    function getSeanceAVenirClient($idClient)
+    {
+        $res = array();
+        $usList = ORM::for_table("utilisateurtoseance")->where("participe", true)->where("idutilisateur", $idClient)->findMany();
+        foreach ($usList as $us) {
+            $seance = ORM::for_table("seance")->where("id", $us->idseance)->whereGt('seance.datedebut', date("Y-m-d h:i"))->findOne();
+            if ($seance != false) {
+                array_push($res, $seance);
+            }
+        }
+        return $res;
+    }
+
+    function getActiviteActive()
+    {
+        return ORM::for_table("activite")->where("archive", false)->findMany();
+    }
+
+    function utilisateurHaveSeance($idUtilisateur, $idSeance)
+    {
+        $us = ORM::for_table("utilisateurtoseance")->where("idutilisateur", $idUtilisateur)->where("idseance", $idSeance)->where("participe", true)->findOne();
+        if (!$us) {
+            return false;
+        } else {
+            return true;
+        }
+    }
+
+    function envoyerUneInvitation($idUtilisateur, $mail, $idSeance)
+    {
+        $utilisateur = $this->getUtilisateur($idUtilisateur);
+        $invite = $this->getUtilisateurByMail($mail);
+        if (strcmp($utilisateur->mail, $mail) != 0 && $invite != false) {
+            $invitation = ORM::for_table("invitation")->create();
+            $invitation->id = $this->getLastId("invitation");
+            $invitation->idutilisateurproposeur = $idUtilisateur;
+            $invitation->idutilisateurinvite = $invite->id;
+            $invitation->idseance = $idSeance;
+            $invitation->save();
+            $message = $invite->nom . " " . $invite->prenom . " invité(e) !";
+        } else {
+            $message = "Invité(e) introuvable";
+        }
+        return $message;
+    }
+
+    function getAllInvitation($idUtilisateur)
+    {
+        $res = array();
+        $invitations = ORM::for_table("invitation")->whereNull("valider")->where("idutilisateurinvite", $idUtilisateur)->findMany();
+        foreach ($invitations as $i) {
+            $seance = ORM::for_table("seance")->where("id", $i->idseance)->whereGt('datedebut', date("Y-m-d h:i"))->findOne();
+            if ($seance != false) {
+                if ($this->getPlaceRestantForSeance($seance->id) != 0)
+                    array_push($res, $i);
+            }
+        }
+        return $res;
+    }
+
+    function getInvitation($idInvitation)
+    {
+        return ORM::for_table("invitation")->findOne($idInvitation);
+    }
+
+    function accepterInvitation($idInvitation, $typepaiement)
+    {
+        $i = ORM::for_table("invitation")->findOne($idInvitation);
+        $i->valider = true;
+        $i->save();
+
+        $this->ajoutClientToSeance($i->idutilisateurinvite, $i->idseance, $typepaiement);
+    }
+
+    function refuserInvitation($idInvitation)
+    {
+        $i = ORM::for_table("invitation")->findOne($idInvitation);
+        $i->valider = false;
+        $i->save();
     }
 }

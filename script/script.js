@@ -34,3 +34,13 @@ function showModalCoach(idCoach){
     $("#modalModifCoach").modal("show");
 }
 
+function showModalReserver(idSeance){
+    $('#hiddenSeance').val(idSeance);
+    $("#modalReservation").modal("show");
+}
+
+function showModalInvitation(idInvitation){
+    $('#idSeanceInvitation').val(idInvitation);
+    $("#modalInvitation").modal("show");
+}
+
