@@ -23,8 +23,11 @@
                             foreach ($db->getSeancePasseeClient($_SESSION['utilisateur']->id) as $s) {
                                 $activite = $db->getActiviteWithId($s->idactivite);
                                 $nomActivite = $activite->libelle;
+                                $nomCoach = "-";
                                 $coach = $db->getUtilisateur($s->idutilisateurcoach);
-                                $nomCoach = $coach->nom;
+                                if($coach){
+                                    $nomCoach = $coach->nom;
+                                }
                                 echo "<tr>";
                                 echo "<td>" . $nomActivite . "</td>";
                                 echo "<td>" . $nomCoach . "</td>";
