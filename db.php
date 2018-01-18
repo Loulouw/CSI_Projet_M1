@@ -126,6 +126,7 @@ class db
         $utilisateur->idstatusutilisateur = $idStatus;
         $utilisateur->idconnexion = $connexion->id;
         $utilisateur->datevalidationpaiement = date("Y-m-d");
+        $utilisateur->typerelance = "mail";
         $utilisateur->save();
 
         $relanceAbonnement = ORM::for_table('relance')->create();
@@ -661,5 +662,11 @@ class db
         $i = ORM::for_table("invitation")->findOne($idInvitation);
         $i->valider = false;
         $i->save();
+    }
+
+    function updateTypeRelance($idU,$type){
+        $u = ORM::for_table('utilisateur')->findOne($idU);
+        $u->typerelance = $type;
+        $u->save();
     }
 }
